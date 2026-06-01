@@ -228,7 +228,7 @@ async def oracle(
         raise HTTPException(400, "Oracle only speaks during day phase")
 
     video_bytes = await video.read()
-    result = await analyze_video(video_bytes, video.filename or "recording.webm")
+    result = await analyze_video(video_bytes, video.filename or "recording.webm", subject_name)
 
     reading = OracleReading(
         subject_name=subject_name,
