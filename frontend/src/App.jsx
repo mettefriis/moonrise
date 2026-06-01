@@ -255,9 +255,43 @@ function Welcome({ onJoined }) {
 }
 
 // ── Lobby ─────────────────────────────────────────────────────────────────────
+const ROLE_GUIDE = [
+  {
+    role: "werewolf", emoji: "🐺", color: "var(--red)",
+    what: "Each night, vote with your pack to kill a villager.",
+    how: "Blend in during the day. Accuse others, seem helpful, never hesitate. Win when wolves equal or outnumber the village.",
+  },
+  {
+    role: "villager", emoji: "🏘️", color: "var(--moon)",
+    what: "No special ability. Your only weapon is your voice.",
+    how: "Watch for inconsistencies. Who deflects questions? Who votes too fast? Identify and eliminate the wolves.",
+  },
+  {
+    role: "seer", emoji: "👁️", color: "var(--purple)",
+    what: "Each night, learn one player's true role.",
+    how: "Guard this knowledge — the wolves will hunt you if you reveal yourself too early. Time your reveal for maximum impact.",
+  },
+  {
+    role: "doctor", emoji: "💉", color: "var(--green)",
+    what: "Each night, protect one player from being killed.",
+    how: "Think like the wolves: who would they most want dead? Protect that person. You may protect yourself once.",
+  },
+  {
+    role: "jester", emoji: "🃏", color: "var(--orange)",
+    what: "Win by getting yourself voted out during the day.",
+    how: "Act suspicious. Change your story. Make the village desperate to eliminate you. You win alone — and it's glorious.",
+  },
+  {
+    role: "hunter", emoji: "🏹", color: "var(--moon)",
+    what: "When eliminated, you take one player with you.",
+    how: "You are a deterrent while alive. When your moment comes, choose your final shot wisely.",
+  },
+];
+
 function Lobby({ gameState, playerId, isHost, onStarted }) {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const start = async () => {
     setLoading(true); setErr("");
@@ -297,16 +331,46 @@ function Lobby({ gameState, playerId, isHost, onStarted }) {
         )}
         {!isHost && <p className="subtitle" style={{ marginTop: "1.5rem" }}>Waiting for host to start…</p>}
       </div>
+
+      <div className="gap-lg" />
+      <button className="btn-ghost btn-small" onClick={() => setShowGuide(g => !g)}>
+        {showGuide ? "Hide Roles ↑" : "How to Play · Roles ↓"}
+      </button>
+
+      {showGuide && (
+        <div className="role-guide fade-in">
+          {ROLE_GUIDE.map(r => (
+            <div key={r.role} className="role-guide-row">
+              <div className="role-guide-header">
+                <span className="role-guide-emoji">{r.emoji}</span>
+                <span className="role-guide-name" style={{ color: r.color }}>{r.role.toUpperCase()}</span>
+              </div>
+              <p className="role-guide-what">{r.what}</p>
+              <p className="role-guide-how">{r.how}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Role Reveal ───────────────────────────────────────────────────────────────
+const ROLE_TIPS = {
+  werewolf: "During the day, act like a concerned villager. Accuse someone credible early — it deflects suspicion. Coordinate kills with your pack on Zoom. Never vote against a fellow wolf unless you must.",
+  villager: "You have no special power, only instincts. Watch for players who deflect questions or accuse too eagerly without reason. Your vote matters — use it well.",
+  seer: "You hold the most dangerous secret in the game. Stay quiet until your knowledge can change the vote. Once you reveal yourself, the wolves will come for you.",
+  doctor: "Think about who the wolves most want dead — probably the seer or the most vocal accuser. Protect them. You can protect yourself, but only once.",
+  jester: "Be erratic. Say things that make no sense. Get caught in a lie on purpose. Make the village so suspicious of you that they can't wait to vote you out. That's how you win.",
+  hunter: "Stay alert. If you die by wolf or by vote, you take someone with you — make it count. Whisper your suspicions to yourself so you're ready when the moment comes.",
+};
+
 function RoleReveal({ gameState, onContinue }) {
   const role = gameState.my_role;
   const emoji = gameState.my_role_emoji;
   const flavor = gameState.my_role_flavor;
   const allies = gameState.wolf_allies || [];
+  const tip = ROLE_TIPS[role];
 
   return (
     <div className="screen fade-in">
@@ -319,6 +383,12 @@ function RoleReveal({ gameState, onContinue }) {
           <p className="wolf-allies">Your pack: {allies.join(", ")} 🐺</p>
         )}
       </div>
+      {tip && (
+        <div className="role-tip fade-in">
+          <p className="role-tip-label">How to play this role</p>
+          <p className="role-tip-text">{tip}</p>
+        </div>
+      )}
       <div className="gap-lg" />
       <button className="btn-moon" onClick={onContinue}>I Know My Role →</button>
     </div>
