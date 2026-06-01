@@ -78,6 +78,12 @@ export default function App() {
     }
   }, [oracleOpen, entered]);
 
+  const [session, setSession] = useState(() => load("moonrise_session") || {});
+  const { code, playerId, playerName } = session;
+
+  const [gameState, , setGameState] = usePoll(code, playerId);
+  const [screen, setScreen] = useState("welcome");
+
   // fade out main music when night begins
   useEffect(() => {
     if (screen === "role_reveal") {
@@ -85,12 +91,6 @@ export default function App() {
       setTimeout(() => { if (audioRef.current) audioRef.current.pause(); }, 2100);
     }
   }, [screen]);
-
-  const [session, setSession] = useState(() => load("moonrise_session") || {});
-  const { code, playerId, playerName } = session;
-
-  const [gameState, , setGameState] = usePoll(code, playerId);
-  const [screen, setScreen] = useState("welcome");
   const [roleRevealed, setRoleRevealed] = useState(false);
   const [oracleResult, setOracleResult] = useState(null);
   const [prevPhase, setPrevPhase] = useState(null);
