@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_URL ?? "";
+const BASE = "";
 
 async function post(path, body) {
   const r = await fetch(BASE + path, {
