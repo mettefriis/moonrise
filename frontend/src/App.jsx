@@ -45,6 +45,13 @@ function fadeAudio(el, targetVol, ms = 800) {
 
 export default function App() {
   const [entered, setEntered] = useState(false);
+
+  useEffect(() => {
+    const ping = () => fetch("/api/health").catch(() => {});
+    ping();
+    const id = setInterval(ping, 9 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
   const [oracleOpen, setOracleOpen] = useState(false);
   const audioRef = useRef(null);
   const oracleAudioRef = useRef(null);

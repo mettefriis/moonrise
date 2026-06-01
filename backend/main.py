@@ -19,6 +19,11 @@ games: dict[str, Game] = {}
 _lock = asyncio.Lock()
 
 
+@app.get("/health")
+async def health():
+    return {"ok": True}
+
+
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 def get_game(code: str) -> Game:
