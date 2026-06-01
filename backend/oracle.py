@@ -1,5 +1,7 @@
-import os, random, httpx
+import os, random, httpx, logging
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -112,7 +114,8 @@ async def analyze_video(video_bytes: bytes, filename: str) -> dict:
             data = resp.json()
             signals = data.get("signals", [])
             return {"signals": signals, "hint": generate_hint(signals), "mocked": False}
-    except Exception:
+    except Exception as e:
+        logger.error("Interhuman API error: %s", e, exc_info=True)
         signals = mock_signals()
         return {"signals": signals, "hint": generate_hint(signals), "mocked": True}
 
