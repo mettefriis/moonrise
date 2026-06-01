@@ -78,6 +78,14 @@ export default function App() {
     }
   }, [oracleOpen, entered]);
 
+  // fade out main music when night begins
+  useEffect(() => {
+    if (screen === "role_reveal") {
+      fadeAudio(audioRef.current, 0, 2000);
+      setTimeout(() => { if (audioRef.current) audioRef.current.pause(); }, 2100);
+    }
+  }, [screen]);
+
   const [session, setSession] = useState(() => load("moonrise_session") || {});
   const { code, playerId, playerName } = session;
 
