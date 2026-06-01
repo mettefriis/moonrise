@@ -159,10 +159,10 @@ export default function App() {
     switch (screen) {
       case "lobby":      content = <Lobby gameState={gameState} playerId={playerId} isHost={isHost} onStarted={setGameState} />; break;
       case "role_reveal": content = <RoleReveal gameState={gameState} onContinue={handleRoleRevealed} />; break;
-      case "night":      content = <NightPhase gameState={gameState} playerId={playerId} isHost={isHost} onAdvanced={setGameState} />; break;
-      case "night_results": content = <NightResults gameState={gameState} isHost={isHost} onAdvanced={setGameState} playerId={playerId} />; break;
+      case "night":      content = <NightPhase key={`night-${gameState.round}`} gameState={gameState} playerId={playerId} isHost={isHost} onAdvanced={setGameState} />; break;
+      case "night_results": content = <NightResults key={`nr-${gameState.round}`} gameState={gameState} isHost={isHost} onAdvanced={setGameState} playerId={playerId} />; break;
       case "hunter_shot": content = <HunterShot gameState={gameState} playerId={playerId} onAdvanced={setGameState} />; break;
-      case "day":        content = <DayPhase gameState={gameState} playerId={playerId} isHost={isHost} onAdvanced={setGameState} onOracle={handleOracle} onOracleOpen={() => setOracleOpen(true)} onOracleClose={() => setOracleOpen(false)} />; break;
+      case "day":        content = <DayPhase key={`day-${gameState.round}`} gameState={gameState} playerId={playerId} isHost={isHost} onAdvanced={setGameState} onOracle={handleOracle} onOracleOpen={() => setOracleOpen(true)} onOracleClose={() => setOracleOpen(false)} />; break;
       case "game_over":  content = <GameOver gameState={gameState} playerId={playerId} onReset={() => { sessionStorage.clear(); window.location.reload(); }} />; break;
       default:           content = <div className="screen"><p className="subtitle">Loading…</p></div>;
     }
