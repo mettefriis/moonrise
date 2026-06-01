@@ -1,4 +1,5 @@
 const BASE = "";
+const BACKEND = import.meta.env.VITE_BACKEND_URL ?? "";
 
 async function post(path, body) {
   const r = await fetch(BASE + path, {
@@ -46,7 +47,7 @@ export const api = {
     const form = new FormData();
     form.append("video", videoBlob, "recording.webm");
     const r = await fetch(
-      `/api/games/${code}/oracle?player_id=${playerId}&subject_name=${encodeURIComponent(subjectName)}`,
+      `${BACKEND}/api/games/${code}/oracle?player_id=${playerId}&subject_name=${encodeURIComponent(subjectName)}`,
       { method: "POST", body: form }
     );
     if (!r.ok) {
