@@ -201,7 +201,7 @@ class Game:
 
         players_out = []
         for p in self.players:
-            role_visible = p.role if (not p.alive or p.id == requesting_player_id) else None
+            role_visible = p.role if (self.phase == "game_over" or not p.alive or p.id == requesting_player_id) else None
             players_out.append({
                 "id": p.id,
                 "name": p.name,
