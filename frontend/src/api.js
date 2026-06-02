@@ -50,8 +50,10 @@ export const api = {
       { method: "POST", body: form }
     );
     if (!r.ok) {
-      const err = await r.json().catch(() => ({ detail: "Oracle unreachable" }));
-      throw new Error(err.detail);
+      const text = await r.text().catch(() => "");
+      let detail = `Oracle error ${r.status}`;
+      try { detail = JSON.parse(text).detail || detail; } catch {}
+      throw new Error(detail);
     }
     return r.json();
   },
