@@ -824,7 +824,7 @@ function OracleRecorder({ gameState, playerId, onResult, onClose }) {
 
   const startRecording = (stream) => {
     chunksRef.current = [];
-    const mr = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const mr = new MediaRecorder(stream, { mimeType: "video/webm", videoBitsPerSecond: 200000 });
     mediaRef.current = mr;
     mr.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
     mr.onstop = () => {
