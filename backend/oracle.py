@@ -80,7 +80,7 @@ def generate_hint(signals: list[dict], subject_name: str = "This person") -> str
 
 
 def mock_signals() -> list[dict]:
-    signal_types = list(SIGNAL_HINTS.keys())
+    signal_types = list(SIGNAL_TEMPLATES.keys())
     n = random.randint(2, 4)
     chosen = random.sample(signal_types, n)
     return [
