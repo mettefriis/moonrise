@@ -104,7 +104,7 @@ async def analyze_video(video_bytes: bytes, filename: str, subject_name: str = "
     try:
         async with httpx.AsyncClient(timeout=60) as client:
             resp = await client.post(
-                "https://api.interhuman.ai/v1/analyze",
+                "https://api.interhuman.ai/v1/upload/analyze",
                 headers={"Authorization": f"Bearer {api_key}"},
                 files={"video": (filename, video_bytes, "video/webm")},
             )
