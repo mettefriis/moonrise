@@ -69,14 +69,12 @@ CLOSINGS = [
 
 
 def generate_hint(signals: list[dict], subject_name: str = "This person") -> str:
-    top = sorted(signals, key=lambda x: x.get("probability", 0), reverse=True)[:2]
-    parts = []
-    for signal in top:
-        options = SIGNAL_TEMPLATES.get(signal["type"], ["{name} showed something the oracle could not name."])
-        template = random.choice(options)
-        parts.append(template.format(name=subject_name))
-    closing = random.choice(CLOSINGS)
-    return " ".join(parts) + " " + closing
+    top = sorted(signals, key=lambda x: x.get("probability", 0), reverse=True)
+    if not top:
+        return f"The oracle sees nothing clear in {subject_name}."
+    best = top[0]
+    options = SIGNAL_TEMPLATES.get(best["type"], ["{name} showed something the oracle could not name."])
+    return random.choice(options).format(name=subject_name)
 
 
 def mock_signals() -> list[dict]:
@@ -102,20 +100,43 @@ async def analyze_video(video_bytes: bytes, filename: str, subject_name: str = "
         return {"signals": signals, "hint": generate_hint(signals, subject_name), "mocked": True}
 
     try:
-        async with httpx.AsyncClient(timeout=60) as client:
+        async with httpx.AsyncClient(timeout=300) as client:
             resp = await client.post(
                 "https://api.interhuman.ai/v1/upload/analyze",
                 headers={"Authorization": f"Bearer {api_key}"},
-                files={"video": (filename, video_bytes, "video/webm")},
+                files={"file": (filename, video_bytes, "video/webm")},
+                data=[
+                    ("include[]", "conversation_quality_overall"),
+                    ("include[]", "conversation_quality_timeline"),
+                ],
             )
             resp.raise_for_status()
             data = resp.json()
-            signals = data.get("signals", [])
+            logger.info("Interhuman response: %s", data)
+            signals = parse_interhuman_signals(data)
             return {"signals": signals, "hint": generate_hint(signals, subject_name), "mocked": False}
     except Exception as e:
         logger.error("Interhuman API error: %s", e, exc_info=True)
         signals = mock_signals()
         return {"signals": signals, "hint": generate_hint(signals, subject_name), "mocked": True}
+
+
+_PROB_MAP = {"high": 0.85, "medium": 0.60, "low": 0.35}
+
+def parse_interhuman_signals(data: dict) -> list:
+    signals = []
+    for s in data.get("signals", []):
+        prob_raw = s.get("probability", "medium")
+        prob = _PROB_MAP.get(prob_raw, 0.5) if isinstance(prob_raw, str) else round(float(prob_raw), 2)
+        signals.append({
+            "type": s.get("type", "").replace("_", " ").title(),
+            "probability": prob,
+            "rationale": s.get("rationale", ""),
+        })
+    if not signals:
+        logger.warning("Could not parse signals from: %s", data)
+        signals = mock_signals()
+    return signals
 
 
 async def _fake_delay():
